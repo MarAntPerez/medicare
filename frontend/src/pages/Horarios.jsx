@@ -1,31 +1,34 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+
 import AdminLayout from "../layouts/AdminLayout";
-import PagoModal from "../components/PagosModal";
+import HorarioModal from "../components/HorarioModal";
 
-function Pagos() {
+function Horarios() {
 
-    const [pagos, setPagos] = useState([]);
+    const [horarios, setHorarios] = useState([]);
+
     const [busqueda, setBusqueda] = useState("");
 
     const [modalOpen, setModalOpen] = useState(false);
-    const [pagoEditando, setPagoEditando] = useState(null);
+
+    const [horarioEditando, setHorarioEditando] = useState(null);
 
     useEffect(() => {
 
-        obtenerPagos();
+        obtenerHorarios();
 
     }, []);
 
-    const obtenerPagos = async () => {
+    const obtenerHorarios = async () => {
 
         try {
 
             const response = await axios.get(
-                "http://127.0.0.1:8000/api/pagos"
+                "http://127.0.0.1:8000/api/horarios"
             );
 
-            setPagos(response.data);
+            setHorarios(response.data);
 
         } catch (error) {
 
@@ -35,32 +38,35 @@ function Pagos() {
 
     };
 
-    const pagosFiltrados = pagos.filter(p =>
-        p.patient_name.toLowerCase().includes(busqueda.toLowerCase())
+    const horariosFiltrados = horarios.filter(h =>
+        h.date.includes(busqueda)
     );
 
-    const guardarPago = async (data) => {
+    const guardarHorario = async (data) => {
 
         try {
 
-            if (pagoEditando) {
+            if (horarioEditando) {
 
                 await axios.put(
-                    `http://127.0.0.1:8000/api/pagos/${pagoEditando.id}`,
+                    `http://127.0.0.1:8000/api/horarios/${horarioEditando.schedule_id}`,
                     data
                 );
 
             } else {
 
                 await axios.post(
-                    "http://127.0.0.1:8000/api/pagos",
+                    "http://127.0.0.1:8000/api/horarios",
                     data
                 );
 
             }
 
             setModalOpen(false);
-            obtenerPagos();
+
+            setHorarioEditando(null);
+
+            obtenerHorarios();
 
         } catch (error) {
 
@@ -70,17 +76,17 @@ function Pagos() {
 
     };
 
-    const eliminarPago = async (id) => {
+    const eliminarHorario = async (id) => {
 
-        if (!confirm("¿Eliminar pago?")) return;
+        if (!confirm("¿Eliminar horario?")) return;
 
         try {
 
             await axios.delete(
-                `http://127.0.0.1:8000/api/pagos/${id}`
+                `http://127.0.0.1:8000/api/horarios/${id}`
             );
 
-            obtenerPagos();
+            obtenerHorarios();
 
         } catch (error) {
 
@@ -99,13 +105,13 @@ function Pagos() {
             <div className="flex justify-between items-center mb-6">
 
                 <h2 className="text-2xl font-bold text-gray-700">
-                    💳 Pagos
+                    ⏰ Horarios
                 </h2>
 
                 <input
                     type="text"
                     className="input-style w-80"
-                    placeholder="Buscar paciente..."
+                    placeholder="Buscar fecha..."
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                 />
@@ -125,10 +131,9 @@ function Pagos() {
                             <tr>
 
                                 <th>ID</th>
-                                <th>Paciente</th>
-                                <th>Monto</th>
                                 <th>Fecha</th>
-                                <th>Método</th>
+                                <th>Hora</th>
+                                <th>Disponible</th>
                                 <th>Acciones</th>
 
                             </tr>
@@ -137,35 +142,51 @@ function Pagos() {
 
                         <tbody>
 
-                            {pagosFiltrados.length > 0 ? (
+                            {horariosFiltrados.length > 0 ? (
 
-                                pagosFiltrados.map((p) => (
+                                horariosFiltrados.map((h) => (
 
-                                    <tr key={p.id}>
+                                    <tr key={h.schedule_id}>
 
-                                        <td>{p.id}</td>
+                                        <td>{h.schedule_id}</td>
 
-                                        <td>
-                                            {p.patient_name}
-                                        </td>
+                                        <td>{h.date}</td>
 
-                                        <td>
-                                            ${p.amount}
-                                        </td>
+                                        <td>{h.hour}</td>
 
                                         <td>
-                                            {p.date}
-                                        </td>
 
-                                        <td>
-                                            {p.method}
+                                            {h.vacant ? (
+
+                                                <span className="badge bg-success">
+                                                    Disponible
+                                                </span>
+
+                                            ) : (
+
+                                                <span className="badge bg-danger">
+                                                    Ocupado
+                                                </span>
+
+                                            )}
+
                                         </td>
 
                                         <td className="flex gap-2">
 
                                             <button
+                                                onClick={() => {
+                                                    setHorarioEditando(h);
+                                                    setModalOpen(true);
+                                                }}
+                                                className="btn btn-warning btn-sm"
+                                            >
+                                                ✏
+                                            </button>
+
+                                            <button
                                                 onClick={() =>
-                                                    eliminarPago(p.id)
+                                                    eliminarHorario(h.schedule_id)
                                                 }
                                                 className="btn btn-danger btn-sm"
                                             >
@@ -182,9 +203,9 @@ function Pagos() {
 
                                 <tr>
 
-                                    <td colSpan="6" className="text-center">
+                                    <td colSpan="5" className="text-center">
 
-                                        No hay pagos registrados
+                                        No hay horarios registrados
 
                                     </td>
 
@@ -198,12 +219,12 @@ function Pagos() {
 
                     <button
                         onClick={() => {
-                            setPagoEditando(null);
+                            setHorarioEditando(null);
                             setModalOpen(true);
                         }}
                         className="btn btn-primary mt-3"
                     >
-                        + Nuevo pago
+                        + Nuevo horario
                     </button>
 
                 </div>
@@ -212,11 +233,11 @@ function Pagos() {
 
             {/* MODAL */}
 
-            <PagoModal
+            <HorarioModal
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
-                onSave={guardarPago}
-                pago={pagoEditando}
+                onSave={guardarHorario}
+                horario={horarioEditando}
             />
 
         </AdminLayout>
@@ -225,4 +246,4 @@ function Pagos() {
 
 }
 
-export default Pagos;
+export default Horarios;

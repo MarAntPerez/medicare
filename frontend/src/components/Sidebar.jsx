@@ -20,6 +20,18 @@ function Sidebar() {
     },
 
     {
+      name: "Horarios",
+      icon: "bi-clock",
+      path: "/horarios"
+    },
+
+    {
+      name: "Pagos",
+      icon: "bi-credit-card",
+      path: "/pagos"
+    },
+
+    {
       name: "Historial",
       icon: "bi-clock-history",
       path: "/historial-citas"
@@ -64,11 +76,10 @@ function Sidebar() {
 
           <button
             key={index}
-            className={`btn w-100 text-start mb-2 d-flex align-items-center gap-2 ${
-              location.pathname === item.path
-                ? "btn-primary"
-                : "btn-light"
-            }`}
+            className={`btn w-100 text-start mb-2 d-flex align-items-center gap-2 ${location.pathname === item.path
+              ? "btn-primary"
+              : "btn-light"
+              }`}
             onClick={() => navigate(item.path)}
           >
 

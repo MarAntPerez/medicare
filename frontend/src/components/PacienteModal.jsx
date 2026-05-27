@@ -16,15 +16,23 @@ function PacienteModal({ isOpen, onClose, onSave, paciente }) {
     useEffect(() => {
 
         if (paciente) {
+
             setForm(paciente);
+
+        } else {
+
+            setForm(initialForm);
+
         }
 
     }, [paciente]);
 
     const handleChange = (e) => {
 
-        setForm(initialForm);
-        onClose();
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        });
 
     };
 
@@ -42,7 +50,7 @@ function PacienteModal({ isOpen, onClose, onSave, paciente }) {
 
     return (
 
-        <div style={{marginTop: "80px"}} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div style={{ marginTop: "80px" }} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
             {/* MODAL */}
             <div className="bg-white w-full max-w-3xl rounded-2xl shadow-xl p-8">

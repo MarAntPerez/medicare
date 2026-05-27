@@ -7,6 +7,9 @@ import HistorialCitas from "./pages/HistorialCitas";
 import Perfil from "./pages/Perfil";
 import Pacientes from "./pages/Pacientes";
 import Pagos from "./pages/Pagos";
+import Horarios from "./pages/Horarios";
+
+import AdminRoute from "./routes/AdminRoute";
 
 function App() {
 
@@ -17,12 +20,15 @@ function App() {
       <Routes>
 
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/citas-pendientes" element={<CitasPendientes />} />
-        <Route path="/historial-citas" element={<HistorialCitas />} />
-        <Route path="/perfil" element={<Perfil />} />
-        <Route path="/pacientes" element={<Pacientes />} />
-        <Route path="/pagos" element={<Pagos />}/>
+
+        {/* RUTAS ADMIN */}
+        <Route path="/dashboard" element={<AdminRoute><Dashboard /></AdminRoute>} />
+        <Route path="/citas-pendientes" element={<AdminRoute><CitasPendientes /></AdminRoute>} />
+        <Route path="/historial-citas" element={<AdminRoute><HistorialCitas /></AdminRoute>} />
+        <Route path="/perfil" element={<AdminRoute><Perfil /></AdminRoute>} />
+        <Route path="/pacientes" element={<AdminRoute><Pacientes /></AdminRoute>} />
+        <Route path="/pagos" element={<AdminRoute><Pagos /></AdminRoute>} />
+        <Route path="/horarios" element={<AdminRoute><Horarios /></AdminRoute>} />
 
       </Routes>
 
