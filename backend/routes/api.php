@@ -5,8 +5,25 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ScheduleController;
 
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/citas', function () {
+
+    return DB::table('appointments')
+        ->join('users', 'appointments.patient_id', '=', 'users.user_id')
+        ->join('schedules', 'appointments.schedule_id', '=', 'schedules.schedule_id')
+        ->select(
+            'appointments.appointment_id',
+            'users.name',
+            'users.lastname',
+            'schedules.date',
+            'schedules.hour'
+        )
+        ->get();
+
+});
 
 Route::get('/citas-pendientes', function () {
 
@@ -117,7 +134,27 @@ Route::put('/actualizar-perfil/{id}', function (Request $request, $id) {
 
 });
 
-Route::get('/pacientes', [AuthController::class,'pacientes']);
+Route::get('/buscar-pacientes', function (Request $request) {
+
+    return DB::table('users')
+        ->where('user_type', 'paciente')
+        ->where(function ($query) use ($request) {
+
+            $query->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('lastname', 'like', '%' . $request->search . '%');
+
+        })
+        ->select(
+            'user_id',
+            'name',
+            'lastname'
+        )
+        ->limit(5)
+        ->get();
+
+});
+
+Route::get('/pacientes', [AuthController::class, 'pacientes']);
 
 Route::post('/pacientes', [AuthController::class, 'storePaciente']);
 
@@ -125,4 +162,6 @@ Route::put('/pacientes/{id}', [AuthController::class, 'updatePaciente']);
 
 Route::delete('/pacientes/{id}', [AuthController::class, 'deletePaciente']);
 
-Route::apiResource('/pagos', PaymentController::class);
+Route::apiResource('pagos', PaymentController::class);
+
+Route::apiResource('horarios', ScheduleController::class);

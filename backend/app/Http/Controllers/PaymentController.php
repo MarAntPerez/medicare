@@ -2,16 +2,50 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
 
+    /* OBTENER PAGOS */
+
     public function index()
     {
 
-        $payments = Payment::with('patient.user')->get();
+        $payments = DB::table('payments')
+
+            ->join(
+                'appointments',
+                'payments.appointment_id',
+                '=',
+                'appointments.appointment_id'
+            )
+
+            ->join(
+                'users',
+                'appointments.patient_id',
+                '=',
+                'users.user_id'
+            )
+
+            ->select(
+
+                'payments.payment_id',
+
+                'payments.amount',
+
+                'payments.payment_method',
+
+                'payments.payment_date',
+
+                'users.name',
+
+                'users.lastname'
+
+            )
+
+            ->get();
 
         return response()->json(
 
@@ -19,17 +53,16 @@ class PaymentController extends Controller
 
                 return [
 
-                    'id' => $p->id,
+                    'id' => $p->payment_id,
 
                     'patient_name' =>
-                        $p->patient->user->name . " " .
-                        $p->patient->user->lastname,
+                        $p->name . " " . $p->lastname,
 
                     'amount' => $p->amount,
 
-                    'date' => $p->date,
+                    'date' => $p->payment_date,
 
-                    'method' => $p->method
+                    'method' => $p->payment_method
 
                 ];
 
@@ -39,33 +72,75 @@ class PaymentController extends Controller
 
     }
 
+    /* CREAR PAGO */
+
     public function store(Request $request)
     {
 
-        $payment = Payment::create($request->all());
+        DB::table('payments')->insert([
 
-        return response()->json($payment);
+            'appointment_id' => $request->appointment_id,
+
+            'amount' => $request->amount,
+
+            'payment_method' => $request->payment_method,
+
+            'status' => 'Pagado',
+
+            'payment_date' => $request->payment_date,
+
+            'created_at' => now(),
+
+            'updated_at' => now()
+
+        ]);
+
+        return response()->json([
+            "message" => "Pago registrado"
+        ]);
 
     }
+
+    /* ACTUALIZAR */
 
     public function update(Request $request, $id)
     {
 
-        $payment = Payment::findOrFail($id);
+        DB::table('payments')
 
-        $payment->update($request->all());
+            ->where('payment_id', $id)
 
-        return response()->json($payment);
+            ->update([
+
+                'amount' => $request->amount,
+
+                'payment_method' => $request->payment_method,
+
+                'payment_date' => $request->payment_date,
+
+                'updated_at' => now()
+
+            ]);
+
+        return response()->json([
+            "message" => "Pago actualizado"
+        ]);
 
     }
+
+    /* ELIMINAR */
 
     public function destroy($id)
     {
 
-        Payment::destroy($id);
+        DB::table('payments')
+
+            ->where('payment_id', $id)
+
+            ->delete();
 
         return response()->json([
-            'message' => 'Pago eliminado'
+            "message" => "Pago eliminado"
         ]);
 
     }

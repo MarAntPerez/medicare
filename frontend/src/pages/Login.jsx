@@ -30,8 +30,23 @@ function Login() {
                 JSON.stringify(response.data.user)
             );
 
-            window.location.href = "/dashboard";
+            const user = response.data.user;
 
+            localStorage.setItem(
+                "user",
+                JSON.stringify(user)
+            );
+
+            if (user.user_type === "admin") {
+
+                window.location.href = "/dashboard";
+
+            } else {
+
+                window.location.href = "/paciente-dashboard";
+
+            }
+            
         } catch (error) {
 
             console.log("ERROR:", error.response);
