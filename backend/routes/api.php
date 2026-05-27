@@ -154,6 +154,82 @@ Route::get('/buscar-pacientes', function (Request $request) {
 
 });
 
+// citas de pacientes en especifico
+Route::get('/mis-citas/{id}', function ($id) {
+
+    return DB::table('appointments')
+        ->join(
+            'schedules',
+            'appointments.schedule_id',
+            '=',
+            'schedules.schedule_id'
+        )
+        ->where('appointments.patient_id', $id)
+        ->select(
+            'appointments.appointment_id',
+            'appointments.status',
+            'appointments.cause',
+            'schedules.date',
+            'schedules.hour'
+        )
+        ->orderBy('schedules.date', 'desc')
+        ->get();
+
+});
+
+// PAGOS DE PACIENTE
+Route::get('/mis-pagos/{id}', function ($id) {
+
+    return DB::table('payments')
+        ->join(
+            'appointments',
+            'payments.appointment_id',
+            '=',
+            'appointments.appointment_id'
+        )
+        ->where('appointments.patient_id', $id)
+        ->select(
+            'payments.payment_id',
+            'payments.amount',
+            'payments.payment_method',
+            'payments.status',
+            'payments.payment_date'
+        )
+        ->orderBy('payments.payment_date', 'desc')
+        ->get();
+
+});
+
+// OBTENER Y EDITAR PERFIL DE PACIENTE
+Route::get('/perfil-paciente/{id}', function ($id) {
+
+    return DB::table('users')
+        ->where('user_id', $id)
+        ->first();
+
+});
+
+Route::put('/perfil-paciente/{id}', function (Request $request, $id) {
+
+    DB::table('users')
+        ->where('user_id', $id)
+        ->update([
+
+            'name' => $request->name,
+            'lastname' => $request->lastname,
+            'email' => $request->email,
+            'cellphone' => $request->cellphone,
+            'birthdate' => $request->birthdate,
+            'updated_at' => now()
+
+        ]);
+
+    return response()->json([
+        'message' => 'Perfil actualizado'
+    ]);
+
+});
+
 Route::get('/pacientes', [AuthController::class, 'pacientes']);
 
 Route::post('/pacientes', [AuthController::class, 'storePaciente']);
@@ -165,3 +241,9 @@ Route::delete('/pacientes/{id}', [AuthController::class, 'deletePaciente']);
 Route::apiResource('pagos', PaymentController::class);
 
 Route::apiResource('horarios', ScheduleController::class);
+
+use App\Http\Controllers\AppointmentController;
+
+Route::get('/horarios-disponibles/{fecha}', [AppointmentController::class, 'horariosDisponibles']);
+
+Route::post('/solicitar-cita', [AppointmentController::class, 'solicitarCita']);

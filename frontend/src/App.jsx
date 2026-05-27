@@ -8,6 +8,11 @@ import Perfil from "./pages/Perfil";
 import Pacientes from "./pages/Pacientes";
 import Pagos from "./pages/Pagos";
 import Horarios from "./pages/Horarios";
+import PacienteDashboard from "./pages/PacienteDashboard";
+import SolicitarCita from "./pages/SolicitarCita";
+import MisCitas from "./pages/MisCitas";
+import MisPagos from "./pages/MisPagos";
+import PerfilPaciente from "./pages/PerfilPaciente";
 
 import AdminRoute from "./routes/AdminRoute";
 
@@ -29,6 +34,12 @@ function App() {
         <Route path="/pacientes" element={<AdminRoute><Pacientes /></AdminRoute>} />
         <Route path="/pagos" element={<AdminRoute><Pagos /></AdminRoute>} />
         <Route path="/horarios" element={<AdminRoute><Horarios /></AdminRoute>} />
+
+        <Route path="/paciente-dashboard" element={<PacienteDashboard />} />
+        <Route path="/solicitar-cita" element={<SolicitarCita />} />
+        <Route path="/mis-citas" element={<MisCitas />} />
+        <Route path="/mis-pagos" element={<MisPagos />} />
+        <Route path="/mi-perfil" element={<PerfilPaciente />} />
 
       </Routes>
 

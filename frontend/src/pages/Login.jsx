@@ -37,6 +37,9 @@ function Login() {
                 JSON.stringify(user)
             );
 
+            localStorage.setItem("user_id", response.data.user.user_id);
+
+
             if (user.user_type === "admin") {
 
                 window.location.href = "/dashboard";
@@ -46,7 +49,7 @@ function Login() {
                 window.location.href = "/paciente-dashboard";
 
             }
-            
+
         } catch (error) {
 
             console.log("ERROR:", error.response);
