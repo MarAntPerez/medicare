@@ -35,7 +35,7 @@ function PacienteDashboard() {
 
                             <button
                                 className="btn btn-secondary w-100"
-                                onClick={() => navigate("/perfil-paciente")}
+                                onClick={() => navigate("/mi-perfil")}
                             >
                                 Ver perfil
                             </button>
